@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres:14.0-alpine3.14
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/dvds.sql:/docker-entrypoint-initdb.d/dvds.sql:ro
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"

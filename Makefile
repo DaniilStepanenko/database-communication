@@ -1,9 +1,19 @@
-test-db: data/dvdrental
-	#docker-compose up -d db
+PG_HOST := localhost
+PG_PORT := 5432
+PG_USER := postgres
+PG_PASS := postgres
+PG_DB := postgres
+PG_SCHEMA := dvds
 
-data/dvdrental: data/dvdrental.tar
-	mkdir -p ./data/dvdrental
-	tar xvf --directory=./data/dvdrental/ ./data/dvdrental.tar
+dev-db:
+	docker-compose -f docker-compose.dev.yml up -d
 
-data/dvdrental.tar:
-	unzip -d data/ data/dvdrental.zip
+jet-pg:
+	jet -source=PostgreSQL \
+		-host=$(PG_HOST) \
+		-port=$(PG_PORT) \
+		-user=$(PG_USER) \
+		-password=$(PG_PASS) \
+		-dbname=$(PG_DB) \
+		-schema=$(PG_SCHEMA) \
+		-path=./pkg/interfaces/repository/jet/internal
