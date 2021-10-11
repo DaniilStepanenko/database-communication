@@ -3,10 +3,9 @@ package jet
 import (
 	"time"
 
-	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository"
-
 	. "github.com/go-jet/jet/v2/postgres"
 
+	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository"
 	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository/jet/internal/postgres/dvds/table"
 	"github.com/DaniilStepanenko/database-communication/pkg/model"
 )
