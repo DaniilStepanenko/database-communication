@@ -19,5 +19,5 @@ type CustomerRepository interface {
 	Delete(ctx context.Context, id int) error
 
 	List(ctx context.Context, list *ListOptions, criteria *CustomerCriteria) ([]*model.Customer, error)
-	FindActiveCustomers(ctx context.Context, lastPaymentNotLater time.Time) ([]*model.Customer, error)
+	FindActiveCustomers(ctx context.Context, lastPaymentNotEarlier time.Time) ([]*model.Customer, error)
 }

@@ -87,7 +87,7 @@ func deleteCustomerQuery(id int) DeleteStatement {
 		)
 }
 
-func findActiveCustomersQuery(lastPaymentNotLater time.Time) SelectStatement {
+func findActiveCustomersQuery(lastPaymentNotEarlier time.Time) SelectStatement {
 	const maxPaymentDate = "max_payment_date"
 
 	payments := SELECT(
@@ -106,7 +106,7 @@ func findActiveCustomersQuery(lastPaymentNotLater time.Time) SelectStatement {
 			payments.AsTable(table.Payment.TableName()), table.Customer.CustomerID.EQ(table.Payment.CustomerID),
 		),
 	).WHERE(
-		TimestampColumn(maxPaymentDate).GT_EQ(TimestampT(lastPaymentNotLater)),
+		TimestampColumn(maxPaymentDate).GT_EQ(TimestampT(lastPaymentNotEarlier)),
 	)
 }
 

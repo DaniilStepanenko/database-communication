@@ -90,8 +90,8 @@ func (c CustomerRepository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (c *CustomerRepository) FindActiveCustomers(ctx context.Context, lastPaymentNotLater time.Time) ([]*model.Customer, error) {
-	stmt := findActiveCustomersQuery(lastPaymentNotLater)
+func (c *CustomerRepository) FindActiveCustomers(ctx context.Context, lastPaymentNotEarlier time.Time) ([]*model.Customer, error) {
+	stmt := findActiveCustomersQuery(lastPaymentNotEarlier)
 	query, args := stmt.Sql()
 
 	rows, err := c.db.QueryContext(ctx, query, args...)
