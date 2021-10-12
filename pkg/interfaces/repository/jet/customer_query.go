@@ -117,7 +117,7 @@ func listCustomersQuery(listOptions *repository.ListOptions, criteria *repositor
 		table.Customer,
 	)
 
-	var conditions = Int(1).EQ(Int(1))
+	var conditions = Bool(true)
 	if criteria != nil && criteria.StoreID != nil {
 		conditions = conditions.AND(table.Customer.StoreID.EQ(Int(int64(*criteria.StoreID))))
 	}
