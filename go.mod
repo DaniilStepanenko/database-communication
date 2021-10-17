@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/go-jet/jet/v2 v2.5.0
+	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.2
 	gorm.io/driver/postgres v1.1.2
 	gorm.io/gorm v1.21.16
