@@ -11,7 +11,7 @@ import (
 	"github.com/DaniilStepanenko/database-communication/pkg/model"
 )
 
-func NewCustomerRepository(db *sql.DB) *CustomerRepository {
+func NewCustomerRepository(db DBTX) *CustomerRepository {
 	return &CustomerRepository{New(db)}
 }
 

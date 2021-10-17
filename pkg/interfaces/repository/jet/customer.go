@@ -11,12 +11,18 @@ import (
 	"github.com/DaniilStepanenko/database-communication/pkg/model"
 )
 
-func NewCustomerRepository(db *sql.DB) *CustomerRepository {
+type SQLHandler interface {
+	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
+	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
+}
+
+func NewCustomerRepository(db SQLHandler) *CustomerRepository {
 	return &CustomerRepository{db}
 }
 
 type CustomerRepository struct {
-	db *sql.DB
+	db SQLHandler
 }
 
 func (c *CustomerRepository) Create(ctx context.Context, customer *model.Customer) (id int, err error) {
