@@ -12,6 +12,8 @@ type CustomerCriteria struct {
 	Query   *string
 }
 
+//go:generate mockgen -destination=./mock/customer.go -package=mockgen -build_flags=--mod=mod . CustomerRepository
+
 type CustomerRepository interface {
 	Create(ctx context.Context, customer *model.Customer) (id int, err error)
 	Read(ctx context.Context, id int) (*model.Customer, error)
