@@ -29,3 +29,6 @@ gorm-playground:
 
 sqlc-playground:
 	PG_HOST=$(PG_HOST) PG_PORT=$(PG_PORT) PG_USER=$(PG_USER) PG_PASS=$(PG_PASS) PG_DB=$(PG_DB) PG_SCHEMA=$(PG_SCHEMA) go run ./cmd/sqlc
+
+generate:
+	go generate -x ./...
