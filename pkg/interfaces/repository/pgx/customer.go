@@ -103,3 +103,6 @@ func listCustomersQuery(listOptions *repository.ListOptions, criteria *repositor
 
 	return query, args
 }
+
+// TODO: remove next line
+var ListCustomersQuery = listCustomersQuery
