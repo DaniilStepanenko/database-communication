@@ -176,11 +176,11 @@ func (c *CustomerRepository) List(ctx context.Context, listOptions *repository.L
 	}
 
 	if listOptions != nil && listOptions.Offset > 0 {
-		stmt.Offset(listOptions.Offset)
+		stmt = stmt.Offset(listOptions.Offset)
 	}
 
 	if listOptions != nil && listOptions.Limit > 0 {
-		stmt.Limit(listOptions.Limit)
+		stmt = stmt.Limit(listOptions.Limit)
 	}
 
 	err = stmt.Find(&result).Error
