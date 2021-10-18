@@ -115,7 +115,7 @@ func (c *CustomerRepository) FindActiveCustomers(ctx context.Context, lastPaymen
 }
 
 func (c *CustomerRepository) List(ctx context.Context, list *repository.ListOptions, criteria *repository.CustomerCriteria) ([]*model.Customer, error) {
-	panic("implement me")
+	return nil, errors.New("not implemented")
 }
 
 var _ repository.CustomerRepository = (*CustomerRepository)(nil)
