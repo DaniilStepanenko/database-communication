@@ -1,7 +1,7 @@
 version: 1
 packages:
-  - path: "pkg/interfaces/repository/sqlc/"
-    name: "sqlc"
+  - path: "pkg/interfaces/repository/sqlc/internal/generated"
+    name: "generated"
     engine: "postgresql"
     schema: "pkg/interfaces/repository/sqlc/schema.sql"
     queries: "pkg/interfaces/repository/sqlc/queries.sql"

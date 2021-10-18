@@ -8,19 +8,20 @@ import (
 	"time"
 
 	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository"
+	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository/sqlc/internal/generated"
 	"github.com/DaniilStepanenko/database-communication/pkg/model"
 )
 
-func NewCustomerRepository(db DBTX) *CustomerRepository {
-	return &CustomerRepository{New(db)}
+func NewCustomerRepository(db generated.DBTX) *CustomerRepository {
+	return &CustomerRepository{generated.New(db)}
 }
 
 type CustomerRepository struct {
-	query *Queries
+	query *generated.Queries
 }
 
 func (c *CustomerRepository) Create(ctx context.Context, customer *model.Customer) (int, error) {
-	id, err := c.query.CreateCustomer(ctx, CreateCustomerParams{
+	id, err := c.query.CreateCustomer(ctx, generated.CreateCustomerParams{
 		StoreID:    int16(customer.StoreID),
 		FirstName:  customer.FirstName,
 		LastName:   customer.LastName,
@@ -60,7 +61,7 @@ func (c *CustomerRepository) Read(ctx context.Context, id int) (*model.Customer,
 }
 
 func (c *CustomerRepository) Update(ctx context.Context, customer *model.Customer) error {
-	params := UpdateCustomerParams{
+	params := generated.UpdateCustomerParams{
 		CustomerID: int32(customer.Id),
 		StoreID:    int16(customer.StoreID),
 		FirstName:  customer.FirstName,
