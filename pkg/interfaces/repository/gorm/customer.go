@@ -169,7 +169,7 @@ func (c *CustomerRepository) List(ctx context.Context, listOptions *repository.L
 		for _, sort := range listOptions.Sort {
 			orderByColumn := clause.OrderByColumn{
 				Column: clause.Column{Name: sort.Property},
-				Desc:   sort.Direction != repository.SortDirectionASC,
+				Desc:   sort.Direction == repository.SortDirectionDESC,
 			}
 			stmt.Order(orderByColumn)
 		}

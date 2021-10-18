@@ -135,10 +135,10 @@ func listCustomersQuery(listOptions *repository.ListOptions, criteria *repositor
 
 	if listOptions != nil {
 		for _, sort := range listOptions.Sort {
-			if sort.Direction == repository.SortDirectionASC {
-				stmt.ORDER_BY(RawString(sort.Property).ASC())
-			} else {
+			if sort.Direction == repository.SortDirectionDESC {
 				stmt.ORDER_BY(RawString(sort.Property).DESC())
+			} else {
+				stmt.ORDER_BY(RawString(sort.Property).ASC())
 			}
 		}
 	}
