@@ -17,7 +17,6 @@ func main() {
 
 	repo, err := gorm.NewCustomerRepository(db)
 	check(err)
-	//repo := jet.NewCustomerRepository(db)
 
 	ctx := context.Background()
 	result, err := repo.List(
