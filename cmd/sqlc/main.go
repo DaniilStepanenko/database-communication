@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository/sqlc"
@@ -12,8 +11,7 @@ import (
 )
 
 func main() {
-	dataSourceName := os.ExpandEnv("postgres://${PG_USER}:${PG_PASS}@${PG_HOST}:${PG_PORT}/${PG_DB}?sslmode=disable")
-	db, err := postgres.NewDB(dataSourceName)
+	db, err := postgres.NewDB()
 	check(err)
 
 	repo := sqlc.NewCustomerRepository(db)

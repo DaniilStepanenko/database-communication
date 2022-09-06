@@ -2,10 +2,12 @@ package postgres
 
 import (
 	"database/sql"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
-func NewDB(dataSourceName string) (*sql.DB, error) {
+func NewDB() (*sql.DB, error) {
+	dataSourceName := os.ExpandEnv("postgres://${PG_USER}:${PG_PASS}@${PG_HOST}:${PG_PORT}/${PG_DB}?sslmode=disable&search_path=${PG_SCHEMA}")
 	return sql.Open("postgres", dataSourceName)
 }

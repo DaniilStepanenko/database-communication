@@ -17,14 +17,7 @@ import (
 	"github.com/DaniilStepanenko/database-communication/pkg/model"
 )
 
-const schema = "dvds"
-
 func NewCustomerRepository(db *sql.DB) *CustomerRepository {
-	// TODO: find the correct way to set the schema name
-	if _, err := db.Exec("SET search_path = " + schema); err != nil {
-		panic(err)
-	}
-
 	drv := entsql.OpenDB("postgres", db)
 	return &CustomerRepository{ent.NewClient(ent.Driver(drv)), true}
 }
