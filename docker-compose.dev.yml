@@ -18,3 +18,13 @@ services:
     restart: always
     ports:
       - "8080:8080"
+
+  app:
+    build: .
+    environment:
+      PG_HOST: db
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASS: postgres
+      PG_DB: postgres
+      PG_SCHEMA: dvds

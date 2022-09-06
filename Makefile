@@ -6,7 +6,7 @@ PG_DB := postgres
 PG_SCHEMA := dvds
 
 dev-db:
-	docker-compose -f docker-compose.dev.yml up -d
+	docker-compose -f docker-compose.dev.yml up -d db adminer
 
 jet-pg:
 	jet -source=PostgreSQL \
@@ -21,17 +21,22 @@ jet-pg:
 sqlc:
 	sqlc generate
 
+playground:
+	echo docker-compose -f docker-compose.dev.yml build app && \
+ 		docker-compose -f docker-compose.dev.yml run --rm --entrypoint=$(ENTRYPOINT) app
+
 jet-playground:
-	PG_HOST=$(PG_HOST) PG_PORT=$(PG_PORT) PG_USER=$(PG_USER) PG_PASS=$(PG_PASS) PG_DB=$(PG_DB) PG_SCHEMA=$(PG_SCHEMA) go run ./cmd/jet
+	make playground ENTRYPOINT="/bin/jet"
 
 gorm-playground:
-	PG_HOST=$(PG_HOST) PG_PORT=$(PG_PORT) PG_USER=$(PG_USER) PG_PASS=$(PG_PASS) PG_DB=$(PG_DB) PG_SCHEMA=$(PG_SCHEMA) go run ./cmd/gorm
+	make playground ENTRYPOINT="/bin/gorm"
 
 sqlc-playground:
-	PG_HOST=$(PG_HOST) PG_PORT=$(PG_PORT) PG_USER=$(PG_USER) PG_PASS=$(PG_PASS) PG_DB=$(PG_DB) PG_SCHEMA=$(PG_SCHEMA) go run ./cmd/sqlc
+	make playground ENTRYPOINT="/bin/sqlc"
 
 ent-playground:
-	PG_HOST=$(PG_HOST) PG_PORT=$(PG_PORT) PG_USER=$(PG_USER) PG_PASS=$(PG_PASS) PG_DB=$(PG_DB) PG_SCHEMA=$(PG_SCHEMA) go run ./cmd/ent
+	make playground ENTRYPOINT="/bin/ent"
+
 
 pre-commit: dependency generate
 

@@ -1,0 +1,6 @@
+.git
+data
+
+Dockerfile
+docker-compose.dev.yml
+.gitignore
