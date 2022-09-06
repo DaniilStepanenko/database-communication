@@ -30,5 +30,13 @@ gorm-playground:
 sqlc-playground:
 	PG_HOST=$(PG_HOST) PG_PORT=$(PG_PORT) PG_USER=$(PG_USER) PG_PASS=$(PG_PASS) PG_DB=$(PG_DB) PG_SCHEMA=$(PG_SCHEMA) go run ./cmd/sqlc
 
+ent-playground:
+	PG_HOST=$(PG_HOST) PG_PORT=$(PG_PORT) PG_USER=$(PG_USER) PG_PASS=$(PG_PASS) PG_DB=$(PG_DB) PG_SCHEMA=$(PG_SCHEMA) go run ./cmd/ent
+
+pre-commit: dependency generate
+
 generate:
 	go generate -x ./...
+
+dependency:
+	go mod tidy && go mod vendor

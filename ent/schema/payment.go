@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -25,12 +26,18 @@ func (Payment) Fields() []ent.Field {
 		field.Int("customer_id"),
 		field.Int("staff_id"),
 		field.Int("rental_id"),
-		field.Int("amount"),
+		field.Float("amount"),
 		field.Time("payment_date"),
 	}
 }
 
 // Edges of the Payment.
 func (Payment) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("payer", Customer.Type).
+			Ref("payments").
+			Unique().
+			Field("customer_id").
+			Required(),
+	}
 }
