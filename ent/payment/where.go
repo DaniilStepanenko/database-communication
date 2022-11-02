@@ -34,7 +34,7 @@ func IDNEQ(id int) predicate.Payment {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...int) predicate.Payment {
 	return predicate.Payment(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -45,7 +45,7 @@ func IDIn(ids ...int) predicate.Payment {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...int) predicate.Payment {
 	return predicate.Payment(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -132,7 +132,7 @@ func CustomerIDNEQ(v int) predicate.Payment {
 
 // CustomerIDIn applies the In predicate on the "customer_id" field.
 func CustomerIDIn(vs ...int) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -143,7 +143,7 @@ func CustomerIDIn(vs ...int) predicate.Payment {
 
 // CustomerIDNotIn applies the NotIn predicate on the "customer_id" field.
 func CustomerIDNotIn(vs ...int) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -168,7 +168,7 @@ func StaffIDNEQ(v int) predicate.Payment {
 
 // StaffIDIn applies the In predicate on the "staff_id" field.
 func StaffIDIn(vs ...int) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -179,7 +179,7 @@ func StaffIDIn(vs ...int) predicate.Payment {
 
 // StaffIDNotIn applies the NotIn predicate on the "staff_id" field.
 func StaffIDNotIn(vs ...int) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -232,7 +232,7 @@ func RentalIDNEQ(v int) predicate.Payment {
 
 // RentalIDIn applies the In predicate on the "rental_id" field.
 func RentalIDIn(vs ...int) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -243,7 +243,7 @@ func RentalIDIn(vs ...int) predicate.Payment {
 
 // RentalIDNotIn applies the NotIn predicate on the "rental_id" field.
 func RentalIDNotIn(vs ...int) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -296,7 +296,7 @@ func AmountNEQ(v float64) predicate.Payment {
 
 // AmountIn applies the In predicate on the "amount" field.
 func AmountIn(vs ...float64) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -307,7 +307,7 @@ func AmountIn(vs ...float64) predicate.Payment {
 
 // AmountNotIn applies the NotIn predicate on the "amount" field.
 func AmountNotIn(vs ...float64) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -360,7 +360,7 @@ func PaymentDateNEQ(v time.Time) predicate.Payment {
 
 // PaymentDateIn applies the In predicate on the "payment_date" field.
 func PaymentDateIn(vs ...time.Time) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -371,7 +371,7 @@ func PaymentDateIn(vs ...time.Time) predicate.Payment {
 
 // PaymentDateNotIn applies the NotIn predicate on the "payment_date" field.
 func PaymentDateNotIn(vs ...time.Time) predicate.Payment {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}

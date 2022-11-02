@@ -248,75 +248,39 @@ func (cc *CustomerCreate) createSpec() (*Customer, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := cc.mutation.StoreID(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldStoreID,
-		})
+		_spec.SetField(customer.FieldStoreID, field.TypeInt, value)
 		_node.StoreID = value
 	}
 	if value, ok := cc.mutation.FirstName(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldFirstName,
-		})
+		_spec.SetField(customer.FieldFirstName, field.TypeString, value)
 		_node.FirstName = value
 	}
 	if value, ok := cc.mutation.LastName(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldLastName,
-		})
+		_spec.SetField(customer.FieldLastName, field.TypeString, value)
 		_node.LastName = value
 	}
 	if value, ok := cc.mutation.Email(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldEmail,
-		})
+		_spec.SetField(customer.FieldEmail, field.TypeString, value)
 		_node.Email = value
 	}
 	if value, ok := cc.mutation.AddressID(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldAddressID,
-		})
+		_spec.SetField(customer.FieldAddressID, field.TypeInt, value)
 		_node.AddressID = value
 	}
 	if value, ok := cc.mutation.Activebool(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: customer.FieldActivebool,
-		})
+		_spec.SetField(customer.FieldActivebool, field.TypeBool, value)
 		_node.Activebool = value
 	}
 	if value, ok := cc.mutation.CreateDate(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: customer.FieldCreateDate,
-		})
+		_spec.SetField(customer.FieldCreateDate, field.TypeTime, value)
 		_node.CreateDate = value
 	}
 	if value, ok := cc.mutation.LastUpdate(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: customer.FieldLastUpdate,
-		})
+		_spec.SetField(customer.FieldLastUpdate, field.TypeTime, value)
 		_node.LastUpdate = value
 	}
 	if value, ok := cc.mutation.Active(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldActive,
-		})
+		_spec.SetField(customer.FieldActive, field.TypeInt, value)
 		_node.Active = value
 	}
 	if nodes := cc.mutation.PaymentsIDs(); len(nodes) > 0 {

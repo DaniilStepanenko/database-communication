@@ -186,7 +186,7 @@ func (c *CustomerClient) DeleteOne(cu *Customer) *CustomerDeleteOne {
 	return c.DeleteOneID(cu.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *CustomerClient) DeleteOneID(id int) *CustomerDeleteOne {
 	builder := c.Delete().Where(customer.ID(id))
 	builder.mutation.id = &id
@@ -218,7 +218,7 @@ func (c *CustomerClient) GetX(ctx context.Context, id int) *Customer {
 // QueryPayments queries the payments edge of a Customer.
 func (c *CustomerClient) QueryPayments(cu *Customer) *PaymentQuery {
 	query := &PaymentQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cu.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(customer.Table, customer.FieldID, id),
@@ -292,7 +292,7 @@ func (c *PaymentClient) DeleteOne(pa *Payment) *PaymentDeleteOne {
 	return c.DeleteOneID(pa.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *PaymentClient) DeleteOneID(id int) *PaymentDeleteOne {
 	builder := c.Delete().Where(payment.ID(id))
 	builder.mutation.id = &id
@@ -324,7 +324,7 @@ func (c *PaymentClient) GetX(ctx context.Context, id int) *Payment {
 // QueryPayer queries the payer edge of a Payment.
 func (c *PaymentClient) QueryPayer(pa *Payment) *CustomerQuery {
 	query := &CustomerQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pa.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(payment.Table, payment.FieldID, id),

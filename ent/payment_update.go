@@ -189,53 +189,25 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := pu.mutation.StaffID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldStaffID,
-		})
+		_spec.SetField(payment.FieldStaffID, field.TypeInt, value)
 	}
 	if value, ok := pu.mutation.AddedStaffID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldStaffID,
-		})
+		_spec.AddField(payment.FieldStaffID, field.TypeInt, value)
 	}
 	if value, ok := pu.mutation.RentalID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldRentalID,
-		})
+		_spec.SetField(payment.FieldRentalID, field.TypeInt, value)
 	}
 	if value, ok := pu.mutation.AddedRentalID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldRentalID,
-		})
+		_spec.AddField(payment.FieldRentalID, field.TypeInt, value)
 	}
 	if value, ok := pu.mutation.Amount(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: payment.FieldAmount,
-		})
+		_spec.SetField(payment.FieldAmount, field.TypeFloat64, value)
 	}
 	if value, ok := pu.mutation.AddedAmount(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: payment.FieldAmount,
-		})
+		_spec.AddField(payment.FieldAmount, field.TypeFloat64, value)
 	}
 	if value, ok := pu.mutation.PaymentDate(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: payment.FieldPaymentDate,
-		})
+		_spec.SetField(payment.FieldPaymentDate, field.TypeTime, value)
 	}
 	if pu.mutation.PayerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -481,53 +453,25 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 		}
 	}
 	if value, ok := puo.mutation.StaffID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldStaffID,
-		})
+		_spec.SetField(payment.FieldStaffID, field.TypeInt, value)
 	}
 	if value, ok := puo.mutation.AddedStaffID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldStaffID,
-		})
+		_spec.AddField(payment.FieldStaffID, field.TypeInt, value)
 	}
 	if value, ok := puo.mutation.RentalID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldRentalID,
-		})
+		_spec.SetField(payment.FieldRentalID, field.TypeInt, value)
 	}
 	if value, ok := puo.mutation.AddedRentalID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldRentalID,
-		})
+		_spec.AddField(payment.FieldRentalID, field.TypeInt, value)
 	}
 	if value, ok := puo.mutation.Amount(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: payment.FieldAmount,
-		})
+		_spec.SetField(payment.FieldAmount, field.TypeFloat64, value)
 	}
 	if value, ok := puo.mutation.AddedAmount(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: payment.FieldAmount,
-		})
+		_spec.AddField(payment.FieldAmount, field.TypeFloat64, value)
 	}
 	if value, ok := puo.mutation.PaymentDate(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: payment.FieldPaymentDate,
-		})
+		_spec.SetField(payment.FieldPaymentDate, field.TypeTime, value)
 	}
 	if puo.mutation.PayerCleared() {
 		edge := &sqlgraph.EdgeSpec{

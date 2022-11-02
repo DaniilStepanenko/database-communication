@@ -196,35 +196,19 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := pc.mutation.StaffID(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldStaffID,
-		})
+		_spec.SetField(payment.FieldStaffID, field.TypeInt, value)
 		_node.StaffID = value
 	}
 	if value, ok := pc.mutation.RentalID(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: payment.FieldRentalID,
-		})
+		_spec.SetField(payment.FieldRentalID, field.TypeInt, value)
 		_node.RentalID = value
 	}
 	if value, ok := pc.mutation.Amount(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: payment.FieldAmount,
-		})
+		_spec.SetField(payment.FieldAmount, field.TypeFloat64, value)
 		_node.Amount = value
 	}
 	if value, ok := pc.mutation.PaymentDate(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: payment.FieldPaymentDate,
-		})
+		_spec.SetField(payment.FieldPaymentDate, field.TypeTime, value)
 		_node.PaymentDate = value
 	}
 	if nodes := pc.mutation.PayerIDs(); len(nodes) > 0 {

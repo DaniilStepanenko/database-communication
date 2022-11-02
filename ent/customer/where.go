@@ -34,7 +34,7 @@ func IDNEQ(id int) predicate.Customer {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...int) predicate.Customer {
 	return predicate.Customer(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -45,7 +45,7 @@ func IDIn(ids ...int) predicate.Customer {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...int) predicate.Customer {
 	return predicate.Customer(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -160,7 +160,7 @@ func StoreIDNEQ(v int) predicate.Customer {
 
 // StoreIDIn applies the In predicate on the "store_id" field.
 func StoreIDIn(vs ...int) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -171,7 +171,7 @@ func StoreIDIn(vs ...int) predicate.Customer {
 
 // StoreIDNotIn applies the NotIn predicate on the "store_id" field.
 func StoreIDNotIn(vs ...int) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -224,7 +224,7 @@ func FirstNameNEQ(v string) predicate.Customer {
 
 // FirstNameIn applies the In predicate on the "first_name" field.
 func FirstNameIn(vs ...string) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -235,7 +235,7 @@ func FirstNameIn(vs ...string) predicate.Customer {
 
 // FirstNameNotIn applies the NotIn predicate on the "first_name" field.
 func FirstNameNotIn(vs ...string) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -323,7 +323,7 @@ func LastNameNEQ(v string) predicate.Customer {
 
 // LastNameIn applies the In predicate on the "last_name" field.
 func LastNameIn(vs ...string) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -334,7 +334,7 @@ func LastNameIn(vs ...string) predicate.Customer {
 
 // LastNameNotIn applies the NotIn predicate on the "last_name" field.
 func LastNameNotIn(vs ...string) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -422,7 +422,7 @@ func EmailNEQ(v string) predicate.Customer {
 
 // EmailIn applies the In predicate on the "email" field.
 func EmailIn(vs ...string) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -433,7 +433,7 @@ func EmailIn(vs ...string) predicate.Customer {
 
 // EmailNotIn applies the NotIn predicate on the "email" field.
 func EmailNotIn(vs ...string) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -535,7 +535,7 @@ func AddressIDNEQ(v int) predicate.Customer {
 
 // AddressIDIn applies the In predicate on the "address_id" field.
 func AddressIDIn(vs ...int) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -546,7 +546,7 @@ func AddressIDIn(vs ...int) predicate.Customer {
 
 // AddressIDNotIn applies the NotIn predicate on the "address_id" field.
 func AddressIDNotIn(vs ...int) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -613,7 +613,7 @@ func CreateDateNEQ(v time.Time) predicate.Customer {
 
 // CreateDateIn applies the In predicate on the "create_date" field.
 func CreateDateIn(vs ...time.Time) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -624,7 +624,7 @@ func CreateDateIn(vs ...time.Time) predicate.Customer {
 
 // CreateDateNotIn applies the NotIn predicate on the "create_date" field.
 func CreateDateNotIn(vs ...time.Time) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -677,7 +677,7 @@ func LastUpdateNEQ(v time.Time) predicate.Customer {
 
 // LastUpdateIn applies the In predicate on the "last_update" field.
 func LastUpdateIn(vs ...time.Time) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -688,7 +688,7 @@ func LastUpdateIn(vs ...time.Time) predicate.Customer {
 
 // LastUpdateNotIn applies the NotIn predicate on the "last_update" field.
 func LastUpdateNotIn(vs ...time.Time) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -755,7 +755,7 @@ func ActiveNEQ(v int) predicate.Customer {
 
 // ActiveIn applies the In predicate on the "active" field.
 func ActiveIn(vs ...int) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -766,7 +766,7 @@ func ActiveIn(vs ...int) predicate.Customer {
 
 // ActiveNotIn applies the NotIn predicate on the "active" field.
 func ActiveNotIn(vs ...int) predicate.Customer {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}

@@ -260,106 +260,49 @@ func (cu *CustomerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := cu.mutation.StoreID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldStoreID,
-		})
+		_spec.SetField(customer.FieldStoreID, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedStoreID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldStoreID,
-		})
+		_spec.AddField(customer.FieldStoreID, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.FirstName(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldFirstName,
-		})
+		_spec.SetField(customer.FieldFirstName, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.LastName(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldLastName,
-		})
+		_spec.SetField(customer.FieldLastName, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Email(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldEmail,
-		})
+		_spec.SetField(customer.FieldEmail, field.TypeString, value)
 	}
 	if cu.mutation.EmailCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Column: customer.FieldEmail,
-		})
+		_spec.ClearField(customer.FieldEmail, field.TypeString)
 	}
 	if value, ok := cu.mutation.AddressID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldAddressID,
-		})
+		_spec.SetField(customer.FieldAddressID, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedAddressID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldAddressID,
-		})
+		_spec.AddField(customer.FieldAddressID, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.Activebool(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: customer.FieldActivebool,
-		})
+		_spec.SetField(customer.FieldActivebool, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.CreateDate(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: customer.FieldCreateDate,
-		})
+		_spec.SetField(customer.FieldCreateDate, field.TypeTime, value)
 	}
 	if value, ok := cu.mutation.LastUpdate(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: customer.FieldLastUpdate,
-		})
+		_spec.SetField(customer.FieldLastUpdate, field.TypeTime, value)
 	}
 	if cu.mutation.LastUpdateCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Column: customer.FieldLastUpdate,
-		})
+		_spec.ClearField(customer.FieldLastUpdate, field.TypeTime)
 	}
 	if value, ok := cu.mutation.Active(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldActive,
-		})
+		_spec.SetField(customer.FieldActive, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedActive(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldActive,
-		})
+		_spec.AddField(customer.FieldActive, field.TypeInt, value)
 	}
 	if cu.mutation.ActiveCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Column: customer.FieldActive,
-		})
+		_spec.ClearField(customer.FieldActive, field.TypeInt)
 	}
 	if cu.mutation.PaymentsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -695,106 +638,49 @@ func (cuo *CustomerUpdateOne) sqlSave(ctx context.Context) (_node *Customer, err
 		}
 	}
 	if value, ok := cuo.mutation.StoreID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldStoreID,
-		})
+		_spec.SetField(customer.FieldStoreID, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedStoreID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldStoreID,
-		})
+		_spec.AddField(customer.FieldStoreID, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.FirstName(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldFirstName,
-		})
+		_spec.SetField(customer.FieldFirstName, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.LastName(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldLastName,
-		})
+		_spec.SetField(customer.FieldLastName, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Email(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: customer.FieldEmail,
-		})
+		_spec.SetField(customer.FieldEmail, field.TypeString, value)
 	}
 	if cuo.mutation.EmailCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Column: customer.FieldEmail,
-		})
+		_spec.ClearField(customer.FieldEmail, field.TypeString)
 	}
 	if value, ok := cuo.mutation.AddressID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldAddressID,
-		})
+		_spec.SetField(customer.FieldAddressID, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedAddressID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldAddressID,
-		})
+		_spec.AddField(customer.FieldAddressID, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.Activebool(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: customer.FieldActivebool,
-		})
+		_spec.SetField(customer.FieldActivebool, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.CreateDate(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: customer.FieldCreateDate,
-		})
+		_spec.SetField(customer.FieldCreateDate, field.TypeTime, value)
 	}
 	if value, ok := cuo.mutation.LastUpdate(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: customer.FieldLastUpdate,
-		})
+		_spec.SetField(customer.FieldLastUpdate, field.TypeTime, value)
 	}
 	if cuo.mutation.LastUpdateCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Column: customer.FieldLastUpdate,
-		})
+		_spec.ClearField(customer.FieldLastUpdate, field.TypeTime)
 	}
 	if value, ok := cuo.mutation.Active(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldActive,
-		})
+		_spec.SetField(customer.FieldActive, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedActive(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: customer.FieldActive,
-		})
+		_spec.AddField(customer.FieldActive, field.TypeInt, value)
 	}
 	if cuo.mutation.ActiveCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Column: customer.FieldActive,
-		})
+		_spec.ClearField(customer.FieldActive, field.TypeInt)
 	}
 	if cuo.mutation.PaymentsCleared() {
 		edge := &sqlgraph.EdgeSpec{
