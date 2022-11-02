@@ -23,8 +23,8 @@ func main() {
 			}},
 		},
 		&repository.CustomerCriteria{
-			StoreID: intPtr(2),
-			Query:   stringPtr("Alex"),
+			StoreID: ptr(2),
+			Query:   ptr("Alex"),
 		},
 	)
 	check(err)
@@ -41,10 +41,6 @@ func check(err error) {
 	}
 }
 
-func stringPtr(s string) *string {
-	return &s
-}
-
-func intPtr(i int) *int {
-	return &i
+func ptr[T any](val T) *T {
+	return &val
 }
