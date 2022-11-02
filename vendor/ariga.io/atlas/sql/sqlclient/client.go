@@ -42,8 +42,9 @@ type (
 		schemahcl.Marshaler
 		schemahcl.Evaluator
 
-		// A func to open a migrate.Driver with a given schema.ExecQuerier. Used when creating a TxClient.
+		// Functions registered by the drivers and used for opening transactions and their clients.
 		openDriver func(schema.ExecQuerier) (migrate.Driver, error)
+		openTx     TxOpener
 	}
 
 	// TxClient is returned by calling Client.Tx. It behaves the same as Client,
@@ -52,7 +53,7 @@ type (
 		*Client
 
 		// The transaction this Client wraps.
-		Tx *sql.Tx
+		Tx *Tx
 	}
 
 	// URL extends the standard url.URL with additional
@@ -61,7 +62,7 @@ type (
 		*url.URL
 
 		// The DSN used for opening the connection.
-		DSN string
+		DSN string `json:"-"`
 
 		// The Schema this client is connected to.
 		Schema string
@@ -73,9 +74,20 @@ func (c *Client) Tx(ctx context.Context, opts *sql.TxOptions) (*TxClient, error)
 	if c.openDriver == nil {
 		return nil, errors.New("sql/sqlclient: unexpected driver opener: <nil>")
 	}
-	tx, err := c.DB.BeginTx(ctx, opts)
-	if err != nil {
-		return nil, fmt.Errorf("sql/sqlclient: starting transaction: %w", err)
+	var tx *Tx
+	switch {
+	case c.openTx != nil:
+		ttx, err := c.openTx(ctx, c.DB, opts)
+		if err != nil {
+			return nil, err
+		}
+		tx = ttx
+	default:
+		ttx, err := c.DB.BeginTx(ctx, opts)
+		if err != nil {
+			return nil, fmt.Errorf("sql/sqlclient: starting transaction: %w", err)
+		}
+		tx = &Tx{Tx: ttx}
 	}
 	drv, err := c.openDriver(tx)
 	if err != nil {
@@ -139,8 +151,9 @@ type (
 
 	driver struct {
 		Opener
-		name   string
-		parser URLParser
+		name     string
+		parser   URLParser
+		txOpener TxOpener
 	}
 )
 
@@ -188,22 +201,26 @@ func OpenURL(ctx context.Context, u *url.URL, opts ...OpenOption) (*Client, erro
 	}
 	v, ok := drivers.Load(u.Scheme)
 	if !ok {
-		return nil, fmt.Errorf("sql/sqlclient: no opener was register with name %q", u.Scheme)
+		return nil, fmt.Errorf("sql/sqlclient: no opener was registered with name %q", u.Scheme)
 	}
+	drv := v.(*driver)
 	// If there is a schema given and the driver allows to change the schema for the url, do it.
 	if cfg.schema != nil {
-		sc, ok := v.(*driver).parser.(SchemaChanger)
+		sc, ok := drv.parser.(SchemaChanger)
 		if !ok {
 			return nil, ErrUnsupported
 		}
 		u = sc.ChangeSchema(u, *cfg.schema)
 	}
-	client, err := v.(*driver).Open(ctx, u)
+	client, err := drv.Open(ctx, u)
 	if err != nil {
 		return nil, err
 	}
 	if client.URL == nil {
-		client.URL = v.(*driver).parser.ParseURL(u)
+		client.URL = drv.parser.ParseURL(u)
+	}
+	if client.openTx == nil && drv.txOpener != nil {
+		client.openTx = drv.txOpener
 	}
 	return client, nil
 }
@@ -220,6 +237,7 @@ func OpenSchema(s string) OpenOption {
 type (
 	registerOptions struct {
 		openDriver func(schema.ExecQuerier) (migrate.Driver, error)
+		txOpener   TxOpener
 		parser     URLParser
 		flavours   []string
 		codec      interface {
@@ -278,12 +296,13 @@ func DriverOpener(open func(schema.ExecQuerier) (migrate.Driver, error)) Opener 
 		if !ok {
 			return nil, fmt.Errorf("sql/sqlclient: unexpected missing opener %q", u.Scheme)
 		}
-		ur := v.(*driver).parser.ParseURL(u)
-		db, err := sql.Open(v.(*driver).name, ur.DSN)
+		drv := v.(*driver)
+		ur := drv.parser.ParseURL(u)
+		db, err := sql.Open(drv.name, ur.DSN)
 		if err != nil {
 			return nil, err
 		}
-		drv, err := open(db)
+		mdr, err := open(db)
 		if err != nil {
 			if cerr := db.Close(); cerr != nil {
 				err = fmt.Errorf("%w: %v", err, cerr)
@@ -291,13 +310,50 @@ func DriverOpener(open func(schema.ExecQuerier) (migrate.Driver, error)) Opener 
 			return nil, err
 		}
 		return &Client{
-			Name:       v.(*driver).name,
+			Name:       drv.name,
 			DB:         db,
 			URL:        ur,
-			Driver:     drv,
+			Driver:     mdr,
 			openDriver: open,
+			openTx:     drv.txOpener,
 		}, nil
 	})
+}
+
+type (
+	// Tx wraps sql.Tx with optional custom Commit and Rollback functions.
+	Tx struct {
+		*sql.Tx
+		CommitFn   func() error // override default commit behavior
+		RollbackFn func() error // override default rollback behavior
+	}
+	// TxOpener opens a transaction with optional closer.
+	TxOpener func(context.Context, *sql.DB, *sql.TxOptions) (*Tx, error)
+)
+
+// Commit the transaction.
+func (tx *Tx) Commit() error {
+	fn := tx.CommitFn
+	if fn == nil {
+		fn = tx.Tx.Commit
+	}
+	return fn()
+}
+
+// Rollback the transaction.
+func (tx *Tx) Rollback() error {
+	fn := tx.RollbackFn
+	if fn == nil {
+		fn = tx.Tx.Rollback
+	}
+	return fn()
+}
+
+// RegisterTxOpener allows registering a custom transaction opener with an optional close function.
+func RegisterTxOpener(open TxOpener) RegisterOption {
+	return func(opts *registerOptions) {
+		opts.txOpener = open
+	}
 }
 
 // Register registers a client Opener (i.e. creator) with the given name.
@@ -335,7 +391,7 @@ func Register(name string, opener Opener, opts ...RegisterOption) {
 			return c, err
 		})
 	}
-	drv := &driver{opener, name, opt.parser}
+	drv := &driver{Opener: opener, name: name, parser: opt.parser, txOpener: opt.txOpener}
 	for _, f := range append(opt.flavours, name) {
 		if _, ok := drivers.Load(f); ok {
 			panic("sql/sqlclient: Register called twice for " + f)

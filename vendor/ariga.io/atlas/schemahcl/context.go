@@ -8,15 +8,17 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/convert"
 )
 
-// varDef is an HCL resource that defines an input variable to the Atlas DDL document.
-type varDef struct {
+// blockVar is an HCL resource that defines an input variable to the Atlas DDL document.
+type blockVar struct {
 	Name    string    `hcl:",label"`
 	Type    cty.Value `hcl:"type"`
 	Default cty.Value `hcl:"default,optional"`
@@ -25,85 +27,175 @@ type varDef struct {
 // setInputVals sets the input values into the evaluation context. HCL documents can define
 // input variables in the document body by defining "variable" blocks:
 //
-// 	variable "name" {
-// 	  type = string // also supported: int, bool
-// 	  default = "rotemtam"
-// 	}
-func (s *State) setInputVals(ctx *hcl.EvalContext, body hcl.Body, input map[string]string) error {
-	var c struct {
-		Vars   []*varDef `hcl:"variable,block"`
-		Remain hcl.Body  `hcl:",remain"`
+//	variable "name" {
+//	  type = string // also supported: number, bool
+//	  default = "rotemtam"
+//	}
+func (s *State) setInputVals(ctx *hcl.EvalContext, body hcl.Body, input map[string]cty.Value) error {
+	var doc struct {
+		Vars   []*blockVar `hcl:"variable,block"`
+		Remain hcl.Body    `hcl:",remain"`
 	}
-	nctx := ctx.NewChild()
-	nctx.Variables = map[string]cty.Value{
-		"string": capsuleTypeVal("string"),
-		"int":    capsuleTypeVal("int"),
-		"bool":   capsuleTypeVal("bool"),
-	}
-	if diag := gohcl.DecodeBody(body, nctx, &c); diag.HasErrors() {
+	if diag := gohcl.DecodeBody(body, ctx, &doc); diag.HasErrors() {
 		return diag
 	}
 	ctxVars := make(map[string]cty.Value)
-	for _, v := range c.Vars {
-		inputVal, ok := input[v.Name]
-		if ok {
-			ctyVal, err := readVar(v, inputVal)
-			if err != nil {
-				return fmt.Errorf("failed reading var: %w", err)
-			}
-			ctxVars[v.Name] = ctyVal
-			continue
-		}
-		if v.Default == cty.NilVal {
+	for _, v := range doc.Vars {
+		var vv cty.Value
+		switch iv, ok := input[v.Name]; {
+		case ok:
+			vv = iv
+		case v.Default != cty.NilVal:
+			vv = v.Default
+		default:
 			return fmt.Errorf("missing value for required variable %q", v.Name)
 		}
-		ctxVars[v.Name] = v.Default
+		vt := v.Type.EncapsulatedValue().(*cty.Type)
+		// In case the input value is a primitive type and the expected type is a list,
+		// wrap it as a list because the variable type may not be known to the caller.
+		if vt.IsListType() && vv.Type().Equals(vt.ElementType()) {
+			vv = cty.ListVal([]cty.Value{vv})
+		}
+		cv, err := convert.Convert(vv, *vt)
+		if err != nil {
+			return fmt.Errorf("variable %q: %w", v.Name, err)
+		}
+		ctxVars[v.Name] = cv
 	}
 	mergeCtxVar(ctx, ctxVars)
 	return nil
 }
 
+// evalReferences evaluates data blocks.
+func (s *State) evalReferences(ctx *hcl.EvalContext, body *hclsyntax.Body) error {
+	type node struct {
+		addr  [3]string
+		edges func() []hcl.Traversal
+		value func() (cty.Value, error)
+	}
+	var (
+		nodes  = make(map[[3]string]*node)
+		blocks = make(hclsyntax.Blocks, 0, len(body.Blocks))
+	)
+	for _, b := range body.Blocks {
+		switch b := b; b.Type {
+		case dataBlock:
+			if len(b.Labels) < 2 {
+				return fmt.Errorf("data block %q must have exactly 2 labels", b.Type)
+			}
+			h, ok := s.config.datasrc[b.Labels[0]]
+			if !ok {
+				return fmt.Errorf("missing data source handler for %q", b.Labels[0])
+			}
+			// Data references are combined from
+			// "data", "source" and "name" labels.
+			addr := [3]string{dataBlock, b.Labels[0], b.Labels[1]}
+			nodes[addr] = &node{
+				addr:  addr,
+				value: func() (cty.Value, error) { return h(ctx, b) },
+				edges: func() []hcl.Traversal { return bodyVars(b.Body) },
+			}
+		case localsBlock:
+			for k, v := range b.Body.Attributes {
+				k, v := k, v
+				// Local references are combined from
+				// "local" and "name" labels.
+				addr := [3]string{localRef, k, ""}
+				nodes[addr] = &node{
+					addr:  addr,
+					edges: func() []hcl.Traversal { return hclsyntax.Variables(v.Expr) },
+					value: func() (cty.Value, error) {
+						v, diags := v.Expr.Value(ctx)
+						if diags.HasErrors() {
+							return cty.NilVal, diags
+						}
+						return v, nil
+					},
+				}
+			}
+		default:
+			blocks = append(blocks, b)
+		}
+	}
+	var (
+		visit    func(n *node) error
+		visited  = make(map[*node]bool)
+		progress = make(map[*node]bool)
+	)
+	visit = func(n *node) error {
+		if visited[n] {
+			return nil
+		}
+		if progress[n] {
+			addr := n.addr[:]
+			if addr[2] == "" {
+				addr = addr[:2]
+			}
+			return fmt.Errorf("cyclic reference to %q", strings.Join(addr, "."))
+		}
+		progress[n] = true
+		for _, e := range n.edges() {
+			var addr [3]string
+			switch root := e.RootName(); {
+			case root == localRef && len(e) == 2:
+				addr = [3]string{localRef, e[1].(hcl.TraverseAttr).Name, ""}
+			case root == dataBlock && len(e) > 2:
+				addr = [3]string{dataBlock, e[1].(hcl.TraverseAttr).Name, e[2].(hcl.TraverseAttr).Name}
+			}
+			// Unrecognized reference.
+			if nodes[addr] == nil {
+				continue
+			}
+			if err := visit(nodes[addr]); err != nil {
+				return err
+			}
+		}
+		delete(progress, n)
+		v, err := n.value()
+		if err != nil {
+			return err
+		}
+		switch n.addr[0] {
+		case dataBlock:
+			data := make(map[string]cty.Value)
+			if vv, ok := ctx.Variables[dataBlock]; ok {
+				data = vv.AsValueMap()
+			}
+			src := make(map[string]cty.Value)
+			if vv, ok := data[n.addr[1]]; ok {
+				src = vv.AsValueMap()
+			}
+			src[n.addr[2]] = v
+			data[n.addr[1]] = cty.ObjectVal(src)
+			ctx.Variables[dataBlock] = cty.ObjectVal(data)
+		case localRef:
+			locals := make(map[string]cty.Value)
+			if vv, ok := ctx.Variables[localRef]; ok {
+				locals = vv.AsValueMap()
+			}
+			locals[n.addr[1]] = v
+			ctx.Variables[localRef] = cty.ObjectVal(locals)
+		}
+		return nil
+	}
+	for _, n := range nodes {
+		if err := visit(n); err != nil {
+			return err
+		}
+	}
+	body.Blocks = blocks
+	return nil
+}
+
 func mergeCtxVar(ctx *hcl.EvalContext, vals map[string]cty.Value) {
-	const key = "var"
-	v, ok := ctx.Variables[key]
+	v, ok := ctx.Variables[varRef]
 	if ok {
 		v.ForEachElement(func(key cty.Value, val cty.Value) (stop bool) {
 			vals[key.AsString()] = val
 			return false
 		})
 	}
-	ctx.Variables[key] = cty.ObjectVal(vals)
-}
-
-// readVar reads the raw inputVal as a cty.Value using the type definition on v.
-func readVar(v *varDef, inputVal string) (cty.Value, error) {
-	et := v.Type.EncapsulatedValue()
-	typ, ok := et.(*Type)
-	if !ok {
-		return cty.NilVal, fmt.Errorf("expected schemahcl.Type got %T", et)
-	}
-	switch typ.T {
-	case "string":
-		return cty.StringVal(inputVal), nil
-	case "int":
-		i, err := strconv.Atoi(inputVal)
-		if err != nil {
-			return cty.NilVal, err
-		}
-		return cty.NumberIntVal(int64(i)), nil
-	case "bool":
-		b, err := strconv.ParseBool(inputVal)
-		if err != nil {
-			return cty.NilVal, err
-		}
-		return cty.BoolVal(b), nil
-	default:
-		return cty.NilVal, fmt.Errorf("unknown type: %q", typ.T)
-	}
-}
-
-func capsuleTypeVal(t string) cty.Value {
-	return cty.CapsuleVal(ctyTypeSpec, &Type{T: t})
+	ctx.Variables[varRef] = cty.ObjectVal(vals)
 }
 
 func setBlockVars(ctx *hcl.EvalContext, b *hclsyntax.Body) (*hcl.EvalContext, error) {
@@ -125,9 +217,11 @@ func blockVars(blocks hclsyntax.Blocks, parentAddr string, defs *blockDef) (map[
 	vars := make(map[string]cty.Value)
 	for name, def := range defs.children {
 		v := make(map[string]cty.Value)
+		qv := make(map[string]map[string]cty.Value)
 		blocks := blocksOfType(blocks, name)
 		if len(blocks) == 0 {
-			v[name] = cty.NullVal(def.asCty())
+			vars[name] = cty.NullVal(def.asCty())
+			continue
 		}
 		var unlabeled int
 		for _, blk := range blocks {
@@ -153,16 +247,18 @@ func blockVars(blocks hclsyntax.Blocks, parentAddr string, defs *blockDef) (map[
 			for k, v := range varMap {
 				attrs[k] = v
 			}
-			key, obj := blkName, cty.ObjectVal(attrs)
-			if qualifier != "" {
-				obj = cty.ObjectVal(
-					map[string]cty.Value{
-						blkName: obj,
-					},
-				)
-				key = qualifier
+			switch {
+			case qualifier != "":
+				obj := cty.ObjectVal(attrs)
+				if _, ok := qv[qualifier]; !ok {
+					qv[qualifier] = make(map[string]cty.Value)
+				}
+				qv[qualifier][blkName] = obj
+				obj = cty.ObjectVal(qv[qualifier])
+				v[qualifier] = obj
+			default:
+				v[blkName] = cty.ObjectVal(attrs)
 			}
-			v[key] = obj
 		}
 		if len(v) > 0 {
 			vars[name] = cty.ObjectVal(v)
@@ -212,7 +308,7 @@ func attrMap(attrs hclsyntax.Attributes) map[string]cty.Value {
 		if diag.HasErrors() {
 			continue
 		}
-		literalValue, err := extractLiteralValue(value)
+		literalValue, err := extractValue(value)
 		if err != nil {
 			continue
 		}
@@ -226,11 +322,11 @@ var (
 	ctySchemaLit = cty.CapsuleWithOps("lit", reflect.TypeOf(LiteralValue{}), &cty.CapsuleOps{
 		// ConversionFrom facilitates reading the encapsulated type as a string, as is needed, for example,
 		// when interpolating it in a string expression.
-		ConversionFrom: func(src cty.Type) func(interface{}, cty.Path) (cty.Value, error) {
+		ConversionFrom: func(src cty.Type) func(any, cty.Path) (cty.Value, error) {
 			if src != cty.String {
 				return nil
 			}
-			return func(i interface{}, path cty.Path) (cty.Value, error) {
+			return func(i any, path cty.Path) (cty.Value, error) {
 				lit, ok := i.(*LiteralValue)
 				if !ok {
 					return cty.Value{}, fmt.Errorf("schemahcl: expected *schemahcl.LiteralValue got %T", i)
@@ -243,12 +339,21 @@ var (
 			}
 		},
 	})
+	ctyNilType  = cty.Capsule("type", reflect.TypeOf(cty.NilType))
 	ctyTypeSpec = cty.Capsule("type", reflect.TypeOf(Type{}))
 	ctyRawExpr  = cty.Capsule("raw_expr", reflect.TypeOf(RawExpr{}))
 )
 
-// varBlock is the block type for variable declarations.
-const varBlock = "variable"
+// Built-in blocks.
+const (
+	varBlock     = "variable"
+	dataBlock    = "data"
+	localsBlock  = "locals"
+	varRef       = "var"
+	localRef     = "local"
+	dynamicBlock = "dynamic"
+	forEachAttr  = "for_each"
+)
 
 // defRegistry returns a tree of blockDef structs representing the schema of the
 // blocks in the *hclsyntax.Body. The returned fields and children of each type
@@ -318,4 +423,14 @@ func extractDef(blk *hclsyntax.Block, parent *blockDef) *blockDef {
 		cur.child(extractDef(c, cur))
 	}
 	return cur
+}
+
+func bodyVars(b *hclsyntax.Body) (vars []hcl.Traversal) {
+	for _, attr := range b.Attributes {
+		vars = append(vars, hclsyntax.Variables(attr.Expr)...)
+	}
+	for _, b := range b.Blocks {
+		vars = append(vars, bodyVars(b.Body)...)
+	}
+	return
 }
