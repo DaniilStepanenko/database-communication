@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository/sqlc"
-
 	"github.com/DaniilStepanenko/database-communication/pkg/infrastructure/db/postgres"
+	"github.com/DaniilStepanenko/database-communication/pkg/interfaces/repository/sqlc"
 )
 
 func main() {
